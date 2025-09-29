@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Books Market</title>
+</head>
+
+<body>
+    <h1>Books Market</h1>
+
+    <form method="post" action="/list">
+        <input name="title" placeholder="Title">
+        <input name="price" placeholder="Price">
+        <input name="seller" placeholder="Seller (shown publicly)">
+        <button type="submit">List</button>
+    </form>
+
+    <h2>Listings</h2>
+    <ul>
+        {% for b in books %}
+        <li>
+            <!-- DANGER path: deliberately unsafe output when vulnerable -->
+            {% if vulnerable %}
+            Title: {{ b.title|safe }} —
+            Price: {{ b.price|safe }} —
+            Seller: {{ b.seller|safe }}
+            {% else %}
+            <!-- Safe path: context-appropriate escaping -->
+            Title: {{ b.title|e }} —
+            Price: {{ b.price|e }} —
+            Seller: {{ b.seller|e }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if vulnerable %}
+    <p style="color:#a00">
+        Vulnerable mode ON (stored XSS possible). Use for **teaching only**.
+    </p>
+    {% else %}
+    <p style="color:#0a0">
+        Hardened mode ON (auto-escape + CSP).
+    </p>
+    {% endif %}
+</body>
+
+</html>
