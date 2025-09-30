@@ -25,7 +25,7 @@ poetry run flask --app flask_books_xss.app run
 1. Build
 
 ```bash
-docker build -t books-xss:latest
+docker build -t books-xss:latest .
 ```
 
 2. Run (in vulnerable mode)
@@ -40,7 +40,7 @@ docker run --rm -p 8080:5000 -e VULNERABLE_MODE=true books-xss:latest
 docker run --rm -p 8080:5000 -e VULNERABLE_MODE=false books-xss:latest
 ```
 
--> Access page on http://localhost:8080
+-> Access page on http://localhost:8080 
 
 ## How to XSS (fetch cookies)
 

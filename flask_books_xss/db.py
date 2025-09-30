@@ -15,7 +15,7 @@ SessionLocal = scoped_session(sessionmaker(autocommit=False, autoflush=False, bi
 Base = declarative_base()
 
 class Listing(Base):
-    __tablename__ = "listings"
+    __tablename__ = "listing"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)

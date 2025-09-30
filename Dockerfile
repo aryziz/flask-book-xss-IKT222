@@ -9,11 +9,8 @@ RUN pip install --no-cache-dir "poetry>=2,<3"
 WORKDIR /app
 COPY pyproject.toml ./
 
-# Install only runtime deps (no dev). Poetry will create its own venv.
 RUN poetry install --no-root --only main --no-interaction --no-ansi
 
-# Copy the Poetry-managed venv to a fixed path we can grab in the next stage
-# (poetry env info -p prints the absolute venv path)
 RUN cp -a "$(poetry env info -p)" /opt/venv
 
 # ========== Runtime ==========
