@@ -1,11 +1,31 @@
 # Flask Books XSS
 
+## Running manually
+### Requirements
+* Python 3.11 or 3.12
+* Poetry 2 (`pip install poetry`)
+
+1. Install dependencies
+```bash
+poetry install
+```
+
+2. Create .env file like `example.env`
+
+3. Run project
+
+```bash
+poetry run booksxss
+# Or
+poetry run flask --app flask_books_xss.app run
+```
+
 ## Running in Docker
 
 1. Build
 
 ```bash
-docker built -t books-xss:latest
+docker build -t books-xss:latest
 ```
 
 2. Run (in vulnerable mode)
@@ -20,6 +40,7 @@ docker run --rm -p 8080:5000 -e VULNERABLE_MODE=true books-xss:latest
 docker run --rm -p 8080:5000 -e VULNERABLE_MODE=false books-xss:latest
 ```
 
+-> Access page on http://localhost:8080
 
 ## How to XSS (fetch cookies)
 

@@ -26,3 +26,6 @@ dev = [
     "ruff (>=0.13.2,<0.14.0)",
     "black (>=25.9.0,<26.0.0)"
 ]
+
+[project.scripts]
+booksxss = 'flask_books_xss.app:main'
