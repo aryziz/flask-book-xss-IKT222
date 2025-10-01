@@ -44,7 +44,7 @@ docker run --rm -p 8080:5000 -e VULNERABLE_MODE=false books-xss:latest
 
 ## How to XSS (fetch cookies)
 
-1. Run app in safe mode (as described previously)
+1. Run app in vulnerable mode (as described previously)
 
 2. As an example, paste this into the Title field:
 
