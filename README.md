@@ -3,16 +3,16 @@
 ## Running manually
 ### Requirements
 * Python 3.11 or 3.12
-* Poetry 2 (`pip install poetry`)
+* Poetry 2 ([Installing instructions](https://python-poetry.org/docs/))
 
 1. Install dependencies
 ```bash
 poetry install
 ```
 
-2. Create .env file like `example.env`
+1. Create .env file like `example.env`
 
-3. Run project
+2. Run project
 
 ```bash
 poetry run booksxss
