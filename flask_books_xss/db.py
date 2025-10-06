@@ -20,7 +20,7 @@ class Listing(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
     seller = Column(String(100), nullable=False)
-    price = Column(String(20), nullable=False)
+    price = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     
 def init_db():

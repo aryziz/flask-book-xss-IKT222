@@ -4,9 +4,47 @@
 <head>
     <meta charset="utf-8">
     <title>Books Market</title>
+    <style>
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .flash-messages li {
+            padding: .5rem .75rem;
+            border-radius: .25rem;
+        }
+
+        .flash-success {
+            background: #e6ffed;
+            border: 1px solid #b7f5c0;
+        }
+
+        .flash-error {
+            background: #ffecec;
+            border: 1px solid #ffb3b3;
+        }
+
+        .flash-info {
+            background: #eef5ff;
+            border: 1px solid #c7d8ff;
+        }
+    </style>
+
 </head>
 
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flash-messages" role="status" aria-live="polite">
+        {% for category, message in messages %}
+        <li class="flash-{{ category|e }}" role="alert">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <h1>Books Market</h1>
 
     <form method="post" action="/list">

