@@ -10,6 +10,7 @@ talisman = Talisman()
 CSP = {
     "default-src": "'self'",
     "script-src": ["'self'"],
+    "style-src": ["'self'"],
     "object-src": "'none'",
     "base-uri": "'self'",
     "frame-ancestors": "'none'"
@@ -24,7 +25,7 @@ def create_app():
         talisman.init_app(
             app,
             content_security_policy=CSP,
-            content_security_policy_nonce_in=["script-src"],
+            content_security_policy_nonce_in=["script-src", "style-src"],
             force_https=False,
             session_cookie_secure=True
         )

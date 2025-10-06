@@ -20,7 +20,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Create .env file like `example.env`
+3. Create .env file like `example.env` (Note: Important to set `VULNERABLE_MODE`)
 
 4. Run project
 

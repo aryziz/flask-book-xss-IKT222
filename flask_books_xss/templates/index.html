@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Books Market</title>
-    <style>
+    <style nonce="{{csp_nonce()}}">
         .flash-messages {
             list-style: none;
             padding: 0;
@@ -29,6 +29,14 @@
         .flash-info {
             background: #eef5ff;
             border: 1px solid #c7d8ff;
+        }
+
+        .success {
+            color: #0a0;
+        }
+
+        .danger {
+            color: #a00;
         }
     </style>
 
@@ -74,11 +82,11 @@
     </ul>
 
     {% if vulnerable %}
-    <p style="color:#a00">
+    <p class="danger">
         Vulnerable mode ON (stored XSS possible).
     </p>
     {% else %}
-    <p style="color:#0a0">
+    <p class="success">
         Hardened mode ON (auto-escape + mitigations).
     </p>
     {% endif %}
