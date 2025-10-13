@@ -1,8 +1,9 @@
 from flask import Flask, g
 from os import getenv
-from .db import init_db, SessionLocal
+from .db import SessionLocal
+from .schema import init_db
 from .routes import web
-from secrets import token_urlsafe
+from .auth import bp as auth_bp
 from flask_talisman import Talisman
 
 talisman = Talisman()
@@ -32,6 +33,7 @@ def create_app():
     init_db()
     
     app.register_blueprint(web, url_prefix='/')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     
     @app.teardown_appcontext
     def remove_session(exception=None):

@@ -1,95 +1,40 @@
-<!doctype html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Listings{% endblock %}
+{% block content %}
 
-<head>
-    <meta charset="utf-8">
-    <title>Books Market</title>
-    <style nonce="{{csp_nonce()}}">
-        .flash-messages {
-            list-style: none;
-            padding: 0;
-            margin: 1rem 0;
-        }
+<h1>Listings</h1>
 
-        .flash-messages li {
-            padding: .5rem .75rem;
-            border-radius: .25rem;
-        }
+{% if user %}
+<form action="{{ url_for('web.list_book') }}" method="post">
+    <label>Title</label>
+    <input name="title" type="text" required>
+    <label>Price (NOK)</label>
+    <input name="price" type="number" min="0" step="0.01" required>
+    <label>Description (optional, HTML allowed)</label>
+    <textarea name="description" rows="4"></textarea>
+    <button type="submit">Create listing</button>
+</form>
+{% else %}
+<p class="muted">
+    Log in to create a listing. <a href="{{ url_for('auth.login') }}">Login</a>
+    or <a href="{{ url_for('auth.register') }}">Register</a>.
+</p>
+{% endif %}
 
-        .flash-success {
-            background: #e6ffed;
-            border: 1px solid #b7f5c0;
-        }
 
-        .flash-error {
-            background: #ffecec;
-            border: 1px solid #ffb3b3;
-        }
-
-        .flash-info {
-            background: #eef5ff;
-            border: 1px solid #c7d8ff;
-        }
-
-        .success {
-            color: #0a0;
-        }
-
-        .danger {
-            color: #a00;
-        }
-    </style>
-
-</head>
-
-<body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <ul class="flash-messages" role="status" aria-live="polite">
-        {% for category, message in messages %}
-        <li class="flash-{{ category|e }}" role="alert">{{ message }}</li>
-        {% endfor %}
-    </ul>
+{% if books %}
+{% for b in books %}
+<div class="card">
+    <h3 style="margin:0">{{ b.title }}</h3>
+    <div class="muted">Price: {{ b.price }} • Posted: {{ b.created_at }}</div>
+    {% if b.description %}
+    Description: {{ b.description | safe }}
     {% endif %}
-    {% endwith %}
+    <div class="muted">Owner user_id: {{ b.user_id }}</div>
+</div>
+{% endfor %}
+{% else %}
+<p class="muted">No listings yet.</p>
+{% endif %}
 
-    <h1>Books Market</h1>
-
-    <form method="post" action="/list">
-        <input name="title" placeholder="Title">
-        <input name="price" placeholder="Price">
-        <input name="seller" placeholder="Seller (shown publicly)">
-        <button type="submit">List</button>
-    </form>
-
-    <h2>Listings</h2>
-    <ul>
-        {% for b in books %}
-        <li>
-            <!-- DANGER path: deliberately unsafe output when vulnerable -->
-            {% if vulnerable %}
-            Title: {{ b.title|safe }} —
-            Price: {{ b.price|safe }} —
-            Seller: {{ b.seller|safe }}
-            {% else %}
-            <!-- Safe path: context-appropriate escaping -->
-            Title: {{ b.title|e }} —
-            Price: {{ b.price|e }} —
-            Seller: {{ b.seller|e }}
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-
-    {% if vulnerable %}
-    <p class="danger">
-        Vulnerable mode ON (stored XSS possible).
-    </p>
-    {% else %}
-    <p class="success">
-        Hardened mode ON (auto-escape + mitigations).
-    </p>
-    {% endif %}
-</body>
-
-</html>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}My Listings{% endblock %}
+{% block content %}
+<h1>My listings</h1>
+
+{% if rows %}
+{% for r in rows %}
+<div class="card">
+    <h3 style="margin:0">{{ r.title }}</h3>
+    <div class="muted">Price: {{ r.price }} • Posted: {{ r.created_at }}</div>
+    {% if r.description %}
+    Description: {{ r.description | safe }}
+    {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<p class="muted">Nothing here yet.</p>
+{% endif %}
+
+{% endblock %}
