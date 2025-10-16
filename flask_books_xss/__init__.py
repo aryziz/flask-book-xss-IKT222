@@ -5,8 +5,10 @@ from .schema import init_db
 from .routes import web
 from .auth import bp as auth_bp
 from flask_talisman import Talisman
+from .utils.limiter import limiter
 
 talisman = Talisman()
+
 
 CSP = {
     "default-src": "'self'",
@@ -21,6 +23,8 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = getenv("SECRET_KEY", "dev")
     app.config['VULNERABLE_MODE'] = getenv("VULNERABLE_MODE", "false").lower() == "true"
+    
+    limiter.init_app(app)
     
     if not app.config["VULNERABLE_MODE"]:
         talisman.init_app(

@@ -8,7 +8,6 @@ from decimal import InvalidOperation
 from bleach.sanitizer import Cleaner
 from flask import (
     Blueprint,
-    current_app,
     flash,
     g,
     redirect,
@@ -40,9 +39,7 @@ def sanitize_html(value: str, *, max_len: int = 500) -> str:
 
 @web.context_processor
 def inject_flags():
-    # g.user is set by auth.py’s before_app_request
     return {
-        "vulnerable": current_app.config.get("VULNERABLE_MODE", False),
         "user": g.get("user"),
     }
 
@@ -61,21 +58,15 @@ def list_book():
     price_raw = request.form.get("price", "")
     description = request.form.get("description", "")
 
-    if not current_app.config.get("VULNERABLE_MODE", False):
-        title = sanitize_html(title, max_len=120)
-        description = sanitize_html(description, max_len=2000)
-        try:
-            price = int(price_raw)
-            if price < 0 or price > 100_000:
-                raise ValueError("Price out of range")
-        except (InvalidOperation, ValueError):
-            flash("Invalid price.", "error")
-            return redirect(url_for("web.index"))
-    else:
-        try:
-            price = int(price_raw)
-        except Exception:
-            price = 0
+    title = sanitize_html(title, max_len=120)
+    description = sanitize_html(description, max_len=2000)
+    try:
+        price = int(price_raw)
+        if price < 0 or price > 100_000:
+            raise ValueError("Price out of range")
+    except (InvalidOperation, ValueError):
+        flash("Invalid price.", "error")
+        return redirect(url_for("web.index"))
 
     if not title:
         flash("Title is required.", "error")
