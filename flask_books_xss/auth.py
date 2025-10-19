@@ -5,6 +5,7 @@ from sqlalchemy import select
 from .db import SessionLocal
 from .models.user import User
 from .security import hash_password, verify_password
+from .utils.limiter import limiter
 
 bp = Blueprint('auth', __name__)
 
@@ -32,12 +33,13 @@ def register():
             return redirect(url_for("auth.register"))
 
         pw_hash = hash_password(password)
-        new_user = User(email=email, password_hash=pw_hash)
+        new_user = User(email=email, password_hash=pw_hash, failed_attempts=0)
         try:
             g.db.add(new_user)
             g.db.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             g.db.rollback()
+            print(e)
             flash("Email already registered.", "error")
             return redirect(url_for("auth.register"))
 
@@ -48,21 +50,21 @@ def register():
     return render_template('register.html')
 
 @bp.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
 def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = request.form.get('password') or ''
-
-        user = g.db.execute(select(User).filter_by(email=email)).scalar_one_or_none()
-        # FIX: pass (stored_hash, password)
-        if user and verify_password(user.password_hash, password):
-            session.clear()
-            session["uid"] = user.id
-            flash("Login successful.", "success")
-            return redirect(url_for("web.index"))
-
-        flash("Invalid email or password.", "error")
-        return redirect(url_for("auth.login"))
+        
+        from .users import authenticate
+        user = authenticate(email, password)
+        if not user:
+            flash("Invalid email or password.", "error")
+            return redirect(url_for("auth.login"))
+        session.clear()
+        session["uid"] = user.id
+        flash("Logged in successfully.", "ok")
+        return redirect(url_for("web.index"))
     return render_template('login.html')
 
 @bp.post('/logout')

@@ -1,6 +1,10 @@
 from argon2 import PasswordHasher
 
-ph = PasswordHasher()
+ph = PasswordHasher(
+    memory_cost=19456,  # Memory cost in kibibytes (19 MiB)
+    parallelism=1,      # Number of parallel threads
+    time_cost=2         # Iteration count
+)
 
 def hash_password(pw: str) -> str:
     return ph.hash(pw)
