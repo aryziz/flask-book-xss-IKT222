@@ -1,7 +1,6 @@
 from __future__ import annotations
 import os, io
 from typing import Optional
-
 from flask import (
     Blueprint, request, redirect, url_for, flash, render_template_string, session, send_file
 )
@@ -9,9 +8,7 @@ from flask import (
 mfa_bp = Blueprint("mfa", __name__, url_prefix="/auth")
 
 from .db import SessionLocal, engine
-
 from .utils.limiter import limiter  
-
 from .models.user import User  
 
 try:
@@ -24,7 +21,6 @@ except Exception:
 REQUIRE_2FA = os.getenv("REQUIRE_2FA", "false").lower() == "true"
 
 from sqlalchemy import Column, Integer, String, ForeignKey
-
 from .models.base import Base
 
 class UserMFA(Base):
@@ -62,6 +58,12 @@ def _get_or_create_secret(uid: int) -> str:
         s.commit()
         return secret
 
+@mfa_bp.get("/mfa/cancel")
+def mfa_cancel():
+    session.pop("mfa_pending_uid", None)
+    flash("2FA verification canceled.", "ok")
+    return redirect(url_for("auth.login"))
+
 
 @mfa_bp.route("/mfa/enable", methods=["GET", "POST"])
 @limiter.limit("5 per minute")
@@ -94,8 +96,14 @@ def mfa_enable():
           </details>
         {% else %}
           <p>2FA is currently <strong>disabled</strong>.</p>
-          <form method="post"><button type="submit">Enable 2FA (generate secret)</button></form>
-        {% endif %}""",
+          <form method="post"><button type="submit">Enable 2FA</button></form>
+        {% endif %}
+        <p style="margin-top:1rem">
+        <a href="{{ url_for('auth.login') }}">Back to Login</a>
+        &nbsp;·&nbsp;
+        <a href="{{ url_for('mfa.login_totp') }}">Login with 2FA</a>
+        </p>
+        """,
         user=user, secret=secret
     )
 
@@ -140,10 +148,6 @@ def mfa_confirm():
 @mfa_bp.route("/login-totp", methods=["GET", "POST"])
 @limiter.limit("10 per minute")
 def login_totp():
-    """
-    Step 1: email/password. If the account has a TOTP secret (or REQUIRE_2FA),
-    redirect to /auth/verify. Otherwise, log in directly.
-    """
     if request.method == "GET":
         return render_template_string(
             """<!doctype html>
@@ -205,7 +209,15 @@ def verify_totp():
             <form method="post">
               <input name="code" pattern="\\d{6}" inputmode="numeric" maxlength="6" placeholder="123456" required>
               <button>Verify</button>
-            </form>"""
+            </form>
+            <p style="margin-top:1rem">
+            <a href="{{ url_for('mfa.mfa_cancel') }}">Cancel</a>
+            &nbsp;·&nbsp;
+            <a href="{{ url_for('mfa.mfa_enable') }}">2FA settings</a>
+            &nbsp;·&nbsp;
+            <a href="{{ url_for('auth.login') }}">Back to Login</a>
+            </p>
+            """
         )
 
     secret = _get_secret(pending_uid)
@@ -222,6 +234,10 @@ def verify_totp():
     session.clear(); session["uid"] = pending_uid
     flash("2FA verified. You are now logged in.", "ok")
     return redirect(url_for("web.index"))
+
+@mfa_bp.route("/mfa/enable", methods=["GET", "POST"])
+def mfa_enable_alias():
+    return redirect(url_for("mfa.verify_totp"), code=302)
 
 @mfa_bp.post("/mfa/disable")
 def mfa_disable():
