@@ -47,8 +47,10 @@ def create_app():
             'authorize_url': 'https://github.com/login/oauth/authorize',
             'token_url': 'https://github.com/login/oauth/access_token',
             'userinfo': {
-                'url': 'https://api.github.com/user/emails',
-                'email': lambda json: json[0]['email'],
+                'url': 'https://api.github.com/user',
+                'emails_url': 'https://api.github.com/user/emails',
+                'id': lambda json: str(json['id']),
+                'login': lambda json: json['login'],
             },
             'scopes': ['user:email'],
         },
