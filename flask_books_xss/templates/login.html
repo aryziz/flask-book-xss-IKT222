@@ -11,9 +11,9 @@
 </form>
 
 <div style="margin-top: 1rem;">
-  <a href="{{ url_for('mfa.login.totp') }}">Login with 2FA</a>
+  <a href="{{ url_for('mfa.login_totp') }}">Login with 2FA</a>
   &nbsp;·&nbsp;
-  <a href="{{ url_for('mfa.mfa_enroll') }}">Enable 2FA</a>
+  <a href="{{ url_for('mfa.mfa_enable') }}">Enable 2FA</a>
 </div>
 
 <p class="muted">No account? <a href="{{ url_for('auth.register') }}">Register</a>.</p>

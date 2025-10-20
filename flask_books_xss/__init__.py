@@ -8,7 +8,7 @@ from .auth import bp as auth_bp
 from flask_talisman import Talisman
 from .utils.limiter import limiter
 from .oauth import bp as oauth2_bp
-from . import mfa
+from .mfa import mfa_bp
 talisman = Talisman()
 
 
@@ -59,7 +59,7 @@ def create_app():
     app.register_blueprint(web, url_prefix='/')
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(oauth2_bp, url_prefix='/oauth') 
-    app.register_blueprint(mfa.mfa_bp, url_prefix='/auth')
+    app.register_blueprint(mfa_bp, url_prefix='/auth')
 
     
     @app.teardown_appcontext

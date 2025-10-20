@@ -73,9 +73,9 @@
         <a href="{{ url_for('auth.login') }}">Login</a>
         <a href="{{ url_for('auth.register') }}">Register</a>
         {% endif %}
-        {% if g.user}
-            <li><a href="{{ url_for ('mfa_enroll') }}">2FA</a></li>
-        {% endif %}
+        {% if g.user%}
+            <li><a href="{{ url_for ('mfa.mfa_enable') }}">2FA</a></li>
+        {% endif %} 
     </nav>
 
 
