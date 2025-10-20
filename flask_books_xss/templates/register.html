@@ -9,5 +9,12 @@
     <input name="password" type="password" minlength="8" required>
     <button type="submit">Create account</button>
 </form>
+<div style="margin-top: 1rem;">
+    <a href="{{ url_for('mfa.mfa_enroll') }}">Enable 2FA after registering</a>
+    <small>(you need to log in first)</small>
+    &nbsp;·&nbsp;
+    <a href="{{ url_for('mfa.login.totp') }}">Login with 2FA</a>
+</div>
+
 <p class="muted">Already registered? <a href="{{ url_for('auth.login') }}">Login</a>.</p>
 {% endblock %}

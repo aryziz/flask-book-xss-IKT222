@@ -9,6 +9,13 @@
     <input name="password" type="password" required>
     <button type="submit">Login</button>
 </form>
+
+<div style="margin-top: 1rem;">
+  <a href="{{ url_for('mfa.login.totp') }}">Login with 2FA</a>
+  &nbsp;·&nbsp;
+  <a href="{{ url_for('mfa.mfa_enroll') }}">Enable 2FA</a>
+</div>
+
 <p class="muted">No account? <a href="{{ url_for('auth.register') }}">Register</a>.</p>
 <p> 
     <a class="btn btn-primary" href="{{ url_for('oauth2.oauth2_authorize', provider='github') }}">
