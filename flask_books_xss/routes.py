@@ -20,7 +20,7 @@ from .listings import create_listing, list_public, list_mine
 
 web = Blueprint("web", __name__)
 
-# ---- HTML sanitizer (corrected) ----
+# ---- HTML sanitizer ----
 _ALLOWED_TAGS = ["b", "i", "em", "strong", "a", "p"]
 _ALLOWED_ATTRS = {"a": ["href", "title", "rel"]}
 _HTML_CLEANER = Cleaner(

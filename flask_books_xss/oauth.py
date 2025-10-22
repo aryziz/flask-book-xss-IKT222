@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 import requests
 from datetime import timedelta
 from sqlalchemy.exc import IntegrityError
-from flask import Blueprint, current_app, abort, redirect, request, session, url_for, flash
+from flask import Blueprint, current_app, abort, redirect, request, session, url_for, flash, Response
 from sqlalchemy import select
 import secrets
 from .db import SessionLocal
@@ -12,7 +12,7 @@ from .models.user import User, OAuthAccount
 from .utils.time import utc_now
 from typing import Dict
 
-bp = Blueprint("oauth2", __name__)  # registered with url_prefix='/oauth' in create_app
+bp = Blueprint("oauth2", __name__)
 
 
 def _get_provider(name: str) -> Dict[str, str]:
@@ -26,7 +26,6 @@ def _get_provider(name: str) -> Dict[str, str]:
 
 @bp.route('/authorize/<provider>')
 def oauth2_authorize(provider):
-    # Use your existing session-based login flag
     if session.get("uid"):
         return redirect(url_for('web.index'))
 
@@ -44,25 +43,19 @@ def oauth2_authorize(provider):
     })
     return redirect(f"{provider_data['authorize_url']}?{qs}")
 
-
-
-
-
 @bp.route('/callback/<provider>')
-def oauth2_callback(provider):
+def oauth2_callback(provider) -> Response:
     if session.get("uid"):
         return redirect(url_for('web.index'))
 
     p = _get_provider(provider)
 
-    # Provider errors
     if 'error' in request.args:
         for k, v in request.args.items():
             if k.startswith('error'):
                 flash(f'{k}: {v}', 'error')
         return redirect(url_for('web.index'))
 
-    # CSRF
     state_in = request.args.get('state')
     if not state_in or state_in != session.get('oauth2_state'):
         abort(401)
@@ -113,11 +106,10 @@ def oauth2_callback(provider):
     get_id_fn = p['userinfo'].get('id')
     if not callable(get_id_fn):
         abort(500, description="Provider config missing callable 'userinfo.id'.")
-    provider_user_id = str(get_id_fn(ui))  # normalize to str
+    provider_user_id = str(get_id_fn(ui))
     if not provider_user_id:
         abort(401, description="Could not obtain user ID from provider.")
 
-    # Try inline email, then /user/emails
     email = ui.get('email')
     if not email:
         emails_url = p['userinfo'].get('emails_url')
@@ -143,7 +135,6 @@ def oauth2_callback(provider):
 
         if oauth_link:
             oauth_link.access_token = access_token
-            # If your model has these fields:
             if hasattr(oauth_link, 'refresh_token'):
                 oauth_link.refresh_token = refresh_token
             if hasattr(oauth_link, 'expires_at'):
@@ -155,7 +146,6 @@ def oauth2_callback(provider):
             flash(f"Logged in with {provider.capitalize()}.", "success")
             return redirect(url_for('web.index'))
 
-        # Not linked yet — find user by email if we have one
         user = None
         if email:
             user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()

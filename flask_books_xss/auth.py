@@ -1,5 +1,5 @@
 # auth.py
-from flask import Blueprint, request, redirect, url_for, flash, render_template, g, session
+from flask import Blueprint, request, redirect, url_for, flash, render_template, g, session, Response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from .db import SessionLocal
@@ -10,7 +10,9 @@ from .utils.limiter import limiter
 bp = Blueprint('auth', __name__)
 
 @bp.before_app_request
-def load_user():
+def load_user() -> None:
+    """Load user before each request.
+    """
     g.db = SessionLocal()
     uid = session.get("uid")
     g.user = g.db.get(User, uid) if uid else None
@@ -21,7 +23,12 @@ def close_db(exc=None):
         g.db.close()
 
 @bp.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> Response:
+    """User registering route
+
+    Returns:
+        Response: Flask Response object
+    """
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = request.form.get('password') or ''
@@ -51,7 +58,12 @@ def register():
 
 @bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
-def login():
+def login() -> Response:
+    """Login route
+
+    Returns:
+        Response: Flask Response object
+    """
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = request.form.get('password') or ''
@@ -68,7 +80,7 @@ def login():
     return render_template('login.html')
 
 @bp.post('/logout')
-def logout():
+def logout() -> Response:
     session.pop("uid", None)
     flash("Logged out.", "ok")
     return redirect(url_for("web.index"))
